@@ -1,0 +1,38 @@
+name: CI
+ 
+on:
+  push:
+    branches: [ task4 ]
+  pull_request:
+    branches: [ master ]
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - uses: actions/checkout@v2
+ 
+    - name: Build
+      run: |
+        cd task4
+        mkdir 3rdparty
+        cd 3rdparty
+        git clone https://github.com/google/googletest
+        export GOOGLE_TEST_DIR=googletest
+        cmake -DCMAKE_INSTALL_PREFIX=/home/runner/work/tp_homework/tp_homework/task4 ..
+        make
+        make install
+   
+    - name: UploadArtifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: Distributive
+        path: /home/runner/work/tp_homework/tp_homework/task4/exe      
+     
+    - name: Test
+      uses: akhtyamovpavel/ActionGtestReport@v0.0.9
+      with:
+        exec-path: "bin/CTestExe"
+        report-path: "report.xml"
+        working-directory: "task4"
